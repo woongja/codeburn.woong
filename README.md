@@ -250,27 +250,21 @@ Claude Code "Fast mode" 사용 시 비용 배율 자동 적용:
 
 ### 🟢 A. 그냥 사용만 하고 싶은 경우 (비개발자 추천)
 
-소스 코드 clone, Node.js 설치, 빌드 과정 **전부 필요 없습니다**.
+git clone, Node.js 설치, 빌드 과정 **전부 필요 없습니다**. ZIP 파일 하나만 받으면 됩니다.
 
-#### 1단계. 저장소 clone
+#### 1단계. 빌드된 앱 ZIP 다운로드
 
-```bash
-git clone https://github.com/woongja/codeburn.woong.git
-```
+👉 **[Releases 페이지](https://github.com/woongja/codeburn.woong/releases)** 에서 최신 버전의
+`CodeBurn-Monitor-vX.X.X-win-x64.zip` 파일을 다운로드하세요.
 
-> git이 없다면 [여기서 저장소 ZIP 다운로드](https://github.com/woongja/codeburn.woong/archive/refs/heads/master.zip)
-> 받아서 압축 풀면 됩니다.
+> Releases 페이지에 파일이 아직 없으면 저장소 주인한테 요청하거나,
+> 아래 **B. 소스에서 빌드** 방법으로 직접 빌드할 수 있습니다.
 
-#### 2단계. 빌드된 앱이 필요해요
+#### 2단계. 압축 풀고 실행
 
-**현재 저장소엔 소스만 있고 `.exe`는 포함되어 있지 않습니다.** 둘 중 하나:
-
-- **방법 1 — 빌드된 파일을 가진 사람(예: 개발자)한테 ZIP으로 받기**
-  - `CodeBurn-Monitor-vX.X.X-win-x64.zip` 을 받으면
-  - 원하는 폴더에 압축 풀기
-  - 그 안의 `CodeBurn Monitor.exe` 더블클릭 → 끝!
-
-- **방법 2 — 직접 빌드** (아래 개발자 섹션 참고, Node.js 필요)
+1. 다운로드한 ZIP을 원하는 폴더 (예: `C:\Program Files\CodeBurn` 또는 `문서\CodeBurn`)에 압축 해제
+2. 압축 푼 `win-unpacked` 폴더 안의 **`CodeBurn Monitor.exe`** 더블클릭
+3. 끝! 위젯이 화면 우측 하단에 떠요
 
 #### 3단계. 편하게 쓰기
 
