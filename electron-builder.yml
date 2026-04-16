@@ -1,0 +1,14 @@
+appId: com.codeburn.monitor
+productName: CodeBurn Monitor
+directories:
+  output: release
+files:
+  - dist/**/*
+  - resources/**/*
+win:
+  target: nsis
+  icon: resources/icon.png
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
