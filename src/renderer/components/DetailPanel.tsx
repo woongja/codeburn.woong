@@ -8,6 +8,7 @@ import { ModelsCard } from './cards/ModelsCard'
 import { ProjectsCard } from './cards/ProjectsCard'
 import { DailyCard } from './cards/DailyCard'
 import { LimitsCard } from './cards/LimitsCard'
+import { ActivityCard } from './cards/ActivityCard'
 import { LayoutEditor } from './LayoutEditor'
 
 type Props = {
@@ -26,6 +27,7 @@ function renderCard(id: CardId, data: UsageData, settings: Settings) {
     case 'models': return <ModelsCard data={data} language={lang} />
     case 'projects': return <ProjectsCard data={data} language={lang} />
     case 'daily': return <DailyCard data={data} language={lang} />
+    case 'activity': return <ActivityCard data={data} language={lang} />
   }
 }
 

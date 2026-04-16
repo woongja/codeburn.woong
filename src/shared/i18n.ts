@@ -27,6 +27,22 @@ const en: Dict = {
   'card.projects.title': 'Projects',
   'card.daily.title': 'Daily',
   'card.limits.title': 'Limits',
+  'card.activity.title': 'By Activity',
+
+  // Task categories
+  'category.coding': 'Coding',
+  'category.debugging': 'Debugging',
+  'category.feature': 'Feature Dev',
+  'category.refactoring': 'Refactoring',
+  'category.testing': 'Testing',
+  'category.exploration': 'Exploration',
+  'category.planning': 'Planning',
+  'category.delegation': 'Delegation',
+  'category.git': 'Git Ops',
+  'category.build': 'Build/Deploy',
+  'category.conversation': 'Conversation',
+  'category.brainstorming': 'Brainstorming',
+  'category.general': 'General',
   'card.limits.5h': '5h Session',
   'card.limits.week': 'Weekly',
   'card.limits.resetMins': 'Reset in {m}m',
@@ -57,6 +73,7 @@ const en: Dict = {
   'cards.models': 'Models',
   'cards.projects': 'Projects',
   'cards.daily': 'Daily Chart',
+  'cards.activity': 'By Activity',
 
   // Tray menu
   'tray.title': 'CodeBurn Monitor',
@@ -107,6 +124,22 @@ const ko: Dict = {
   'card.projects.title': '프로젝트',
   'card.daily.title': '일별',
   'card.limits.title': '리밋',
+  'card.activity.title': '작업 유형',
+
+  // Task categories
+  'category.coding': '코딩',
+  'category.debugging': '디버깅',
+  'category.feature': '기능 개발',
+  'category.refactoring': '리팩토링',
+  'category.testing': '테스트',
+  'category.exploration': '탐색/학습',
+  'category.planning': '계획/설계',
+  'category.delegation': '에이전트 위임',
+  'category.git': 'Git 작업',
+  'category.build': '빌드/배포',
+  'category.conversation': '대화',
+  'category.brainstorming': '브레인스토밍',
+  'category.general': '기타',
   'card.limits.5h': '5시간 세션',
   'card.limits.week': '주간',
   'card.limits.resetMins': '{m}분 후 리셋',
@@ -137,6 +170,7 @@ const ko: Dict = {
   'cards.models': '모델별 비용',
   'cards.projects': '프로젝트별 비용',
   'cards.daily': '일별 차트',
+  'cards.activity': '작업 유형별',
 
   // Tray menu
   'tray.title': 'CodeBurn 모니터',

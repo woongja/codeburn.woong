@@ -69,6 +69,28 @@ export type DailyBreakdown = {
   readonly apiCalls: number
 }
 
+// Task categories for "By Activity" breakdown
+export type TaskCategory =
+  | 'coding'
+  | 'debugging'
+  | 'feature'
+  | 'refactoring'
+  | 'testing'
+  | 'exploration'
+  | 'planning'
+  | 'delegation'
+  | 'git'
+  | 'build'
+  | 'conversation'
+  | 'brainstorming'
+  | 'general'
+
+export type CategoryBreakdown = {
+  readonly category: TaskCategory
+  readonly turns: number
+  readonly costUSD: number
+}
+
 // Aggregated stats for a fixed time window (used by limits card)
 export type WindowStats = {
   readonly costUSD: number
@@ -86,6 +108,7 @@ export type UsageData = {
   readonly models: ReadonlyArray<ModelBreakdown>
   readonly projects: ReadonlyArray<ProjectBreakdown>
   readonly daily: ReadonlyArray<DailyBreakdown>
+  readonly categories: ReadonlyArray<CategoryBreakdown>
   // Always-current windows (independent of selected period)
   readonly last5h: WindowStats
   readonly last7d: WindowStats
@@ -95,7 +118,7 @@ export type UsageData = {
 export type Plan = 'free' | 'pro' | 'max5x' | 'max20x'
 
 // Card IDs for layout editor
-export type CardId = 'cost' | 'stats' | 'tokens' | 'models' | 'projects' | 'daily' | 'limits'
+export type CardId = 'cost' | 'stats' | 'tokens' | 'models' | 'projects' | 'daily' | 'limits' | 'activity'
 
 export type CardConfig = {
   readonly id: CardId

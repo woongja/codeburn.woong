@@ -22,15 +22,16 @@ export const WIDGET_SIZES = {
 } as const
 
 export const DEFAULT_CARDS: ReadonlyArray<CardConfig> = [
-  // Default visible (top to bottom): projects, stats, tokens, limits
+  // Default visible (top to bottom): projects, activity, stats, tokens, limits
   { id: 'projects', enabled: true, order: 0 },
-  { id: 'stats', enabled: true, order: 1 },
-  { id: 'tokens', enabled: true, order: 2 },
-  { id: 'limits', enabled: true, order: 3 },
+  { id: 'activity', enabled: true, order: 1 },
+  { id: 'stats', enabled: true, order: 2 },
+  { id: 'tokens', enabled: true, order: 3 },
+  { id: 'limits', enabled: true, order: 4 },
   // Available but off by default (user can enable in Layout Editor)
-  { id: 'cost', enabled: false, order: 4 },
-  { id: 'models', enabled: false, order: 5 },
-  { id: 'daily', enabled: false, order: 6 },
+  { id: 'cost', enabled: false, order: 5 },
+  { id: 'models', enabled: false, order: 6 },
+  { id: 'daily', enabled: false, order: 7 },
 ]
 
 export const DEFAULT_LAYOUT: LayoutSettings = {

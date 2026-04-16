@@ -2,14 +2,18 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { CLAUDE_PROJECTS_DIR, MODEL_DISPLAY_NAMES } from './constants'
 import { calculateCost, initPricing } from './pricing'
+import { classifyTurn } from './classifier'
 import type {
   JournalEntry,
+  ContentBlock,
   ParsedApiCall,
   TokenUsage,
   UsageData,
   ModelBreakdown,
   ProjectBreakdown,
   DailyBreakdown,
+  CategoryBreakdown,
+  TaskCategory,
   Period,
   WindowStats,
 } from './types'
@@ -36,6 +40,62 @@ function getMessageId(entry: JournalEntry): string | undefined {
     return entry.message.id
   }
   return undefined
+}
+
+function getUserText(entry: JournalEntry): string {
+  const msg = entry.message
+  if (!msg || msg.role !== 'user') return ''
+  const content = msg.content
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .filter((b): b is { type: 'text'; text: string } =>
+        typeof b === 'object' && b !== null && b.type === 'text' && typeof (b as { text?: unknown }).text === 'string',
+      )
+      .map((b) => b.text)
+      .join(' ')
+  }
+  return ''
+}
+
+function extractToolsFromContent(content: ReadonlyArray<ContentBlock> | undefined): string[] {
+  if (!content) return []
+  const tools: string[] = []
+  for (const block of content) {
+    if (block && typeof block === 'object' && block.type === 'tool_use') {
+      const name = (block as { name?: unknown }).name
+      if (typeof name === 'string') tools.push(name)
+    }
+  }
+  return tools
+}
+
+const BASH_TOOL_NAMES = new Set(['Bash', 'BashTool', 'Shell'])
+
+function extractBashCommands(content: ReadonlyArray<ContentBlock> | undefined): string[] {
+  if (!content) return []
+  const cmds: string[] = []
+  for (const block of content) {
+    if (block && typeof block === 'object' && block.type === 'tool_use') {
+      const name = (block as { name?: unknown }).name
+      if (typeof name === 'string' && BASH_TOOL_NAMES.has(name)) {
+        const input = (block as { input?: unknown }).input
+        if (input && typeof input === 'object') {
+          const cmd = (input as { command?: unknown }).command
+          if (typeof cmd === 'string') cmds.push(cmd)
+        }
+      }
+    }
+  }
+  return cmds
+}
+
+type ParsedTurn = {
+  userMessage: string
+  tools: string[]
+  bashCommands: string[]
+  calls: ParsedApiCall[]
+  category: TaskCategory
 }
 
 function parseApiCall(entry: JournalEntry): ParsedApiCall | null {
@@ -75,10 +135,10 @@ function parseApiCall(entry: JournalEntry): ParsedApiCall | null {
   }
 }
 
-function parseSessionFile(
+function parseSessionFileIntoTurns(
   filePath: string,
   seenIds: Set<string>,
-): ReadonlyArray<ParsedApiCall> {
+): ReadonlyArray<ParsedTurn> {
   let content: string
   try {
     content = fs.readFileSync(filePath, 'utf-8')
@@ -87,24 +147,63 @@ function parseSessionFile(
   }
 
   const lines = content.split('\n')
-  const calls: ParsedApiCall[] = []
+  const turns: ParsedTurn[] = []
+
+  let currentUserMsg = ''
+  let currentTools: string[] = []
+  let currentBash: string[] = []
+  let currentCalls: ParsedApiCall[] = []
+
+  const flushTurn = () => {
+    if (currentCalls.length > 0) {
+      const category = classifyTurn(currentUserMsg, currentTools, currentBash)
+      turns.push({
+        userMessage: currentUserMsg,
+        tools: currentTools,
+        bashCommands: currentBash,
+        calls: currentCalls,
+        category,
+      })
+    }
+    currentTools = []
+    currentBash = []
+    currentCalls = []
+  }
 
   for (const line of lines) {
     if (!line.trim()) continue
     const entry = parseJsonlLine(line)
     if (!entry) continue
 
+    // User entry starts a new turn
+    if (entry.message?.role === 'user') {
+      flushTurn()
+      currentUserMsg = getUserText(entry)
+      continue
+    }
+
+    // Assistant entry contributes tools/bash/calls to current turn
     if (entry.type === 'assistant' || entry.message?.role === 'assistant') {
       const msgId = getMessageId(entry)
       if (msgId && seenIds.has(msgId)) continue
       if (msgId) seenIds.add(msgId)
 
+      const msg = entry.message
+      if (msg?.role === 'assistant') {
+        const contentArr = Array.isArray(msg.content) ? msg.content : undefined
+        currentTools.push(...extractToolsFromContent(contentArr))
+        currentBash.push(...extractBashCommands(contentArr))
+      }
+
       const call = parseApiCall(entry)
-      if (call) calls.push(call)
+      if (call) currentCalls.push(call)
     }
   }
 
-  return calls
+  // Flush the last turn
+  flushTurn()
+
+  return turns
 }
 
 function collectJsonlFiles(dirPath: string): string[] {
@@ -190,11 +289,18 @@ function aggregateWindow(calls: ReadonlyArray<ParsedApiCall>, windowMs: number):
   return { costUSD: cost, apiCalls: count, oldestTimestamp: oldest }
 }
 
+// A turn is "in range" if ANY of its calls is in range. Returns the filtered calls.
+function filterTurnInRange(turn: ParsedTurn, start: Date, end: Date): ParsedTurn | null {
+  const filteredCalls = turn.calls.filter((c) => isInRange(c.timestamp, start, end))
+  if (filteredCalls.length === 0) return null
+  return { ...turn, calls: filteredCalls }
+}
+
 export async function parseAllSessions(period: Period): Promise<UsageData> {
   await initPricing()
 
   const seenIds = new Set<string>()
-  const periodCalls: ParsedApiCall[] = []
+  const periodTurns: ParsedTurn[] = []
   const allTimeCalls: ParsedApiCall[] = []
   const projectCalls = new Map<string, ParsedApiCall[]>()
   let sessionCount = 0
@@ -219,14 +325,21 @@ export async function parseAllSessions(period: Period): Promise<UsageData> {
 
     const projectCallList: ParsedApiCall[] = []
     for (const file of jsonlFiles) {
-      const calls = parseSessionFile(file, seenIds)
-      allTimeCalls.push(...calls)
-      const filtered = calls.filter((c) => isInRange(c.timestamp, start, end))
-      if (filtered.length > 0) {
-        sessionCount++
-        projectCallList.push(...filtered)
-        periodCalls.push(...filtered)
+      const turns = parseSessionFileIntoTurns(file, seenIds)
+      // Flatten all turns' calls for all-time window aggregation
+      for (const turn of turns) allTimeCalls.push(...turn.calls)
+
+      // Filter turns to the selected period
+      let hadTurnsInRange = false
+      for (const turn of turns) {
+        const filtered = filterTurnInRange(turn, start, end)
+        if (filtered) {
+          hadTurnsInRange = true
+          periodTurns.push(filtered)
+          projectCallList.push(...filtered.calls)
+        }
       }
+      if (hadTurnsInRange) sessionCount++
     }
 
     if (projectCallList.length > 0) {
@@ -238,16 +351,17 @@ export async function parseAllSessions(period: Period): Promise<UsageData> {
   const last5h = aggregateWindow(allTimeCalls, 5 * 60 * 60 * 1000)
   const last7d = aggregateWindow(allTimeCalls, 7 * 24 * 60 * 60 * 1000)
 
-  return buildUsageData(periodCalls, projectCalls, sessionCount, last5h, last7d)
+  return buildUsageData(periodTurns, projectCalls, sessionCount, last5h, last7d)
 }
 
 function buildUsageData(
-  allCalls: ReadonlyArray<ParsedApiCall>,
+  turns: ReadonlyArray<ParsedTurn>,
   projectCalls: Map<string, ParsedApiCall[]>,
   sessionCount: number,
   last5h: WindowStats,
   last7d: WindowStats,
 ): UsageData {
+  const allCalls = turns.flatMap((t) => t.calls)
   if (allCalls.length === 0) return { ...emptyUsageData(), last5h, last7d }
 
   // Aggregate totals
@@ -332,6 +446,24 @@ function buildUsageData(
     .map(([date, data]) => ({ date, ...data }))
     .sort((a, b) => a.date.localeCompare(b.date))
 
+  // Categories: aggregate cost and turn count per category, sorted by cost desc
+  const categoryMap = new Map<TaskCategory, { turns: number; costUSD: number }>()
+  for (const turn of turns) {
+    const turnCost = turn.calls.reduce((sum, c) => sum + c.costUSD, 0)
+    const existing = categoryMap.get(turn.category)
+    if (existing) {
+      categoryMap.set(turn.category, {
+        turns: existing.turns + 1,
+        costUSD: existing.costUSD + turnCost,
+      })
+    } else {
+      categoryMap.set(turn.category, { turns: 1, costUSD: turnCost })
+    }
+  }
+  const categories: CategoryBreakdown[] = Array.from(categoryMap.entries())
+    .map(([category, data]) => ({ category, ...data }))
+    .sort((a, b) => b.costUSD - a.costUSD)
+
   return {
     totalCostUSD: totalCost,
     totalApiCalls: allCalls.length,
@@ -346,6 +478,7 @@ function buildUsageData(
     models,
     projects,
     daily,
+    categories,
     last5h,
     last7d,
   }
@@ -361,6 +494,7 @@ function emptyUsageData(): UsageData {
     models: [],
     projects: [],
     daily: [],
+    categories: [],
     last5h: { costUSD: 0, apiCalls: 0, oldestTimestamp: null },
     last7d: { costUSD: 0, apiCalls: 0, oldestTimestamp: null },
   }
