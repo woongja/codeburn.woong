@@ -5,10 +5,14 @@ directories:
 files:
   - dist/**/*
   - resources/**/*
+  - package.json
+# Disable code signing (no cert, no signtool download)
+forceCodeSigning: false
 win:
-  target: nsis
+  # Use 'dir' for a simple unpacked folder (no code signing needed),
+  # or 'portable' for a single .exe.
+  target:
+    - target: dir
+      arch: x64
   icon: resources/icon.png
-nsis:
-  oneClick: true
-  perMachine: false
-  allowToChangeInstallationDirectory: false
+  signAndEditExecutable: false

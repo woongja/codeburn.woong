@@ -195,14 +195,35 @@ npm run electron:dev
 Vite dev server + TypeScript watch + Electron이 동시에 실행됩니다.
 DevTools도 자동으로 열립니다.
 
-### 프로덕션 빌드 (.exe 생성)
+### 프로덕션 빌드 (Unpacked .exe)
 
 ```bash
-npm run build   # dist/ 생성
-npm run dist    # release/ 에 Windows 설치 파일 생성
+npm run build   # dist/ 생성 (renderer + main 컴파일)
+npm run pack    # release/win-unpacked/ 에 실행 파일 생성
 ```
 
-### 빌드 결과물 직접 실행
+빌드 후 `release/win-unpacked/CodeBurn Monitor.exe` 더블클릭으로 실행합니다.
+크기는 약 230MB (Electron + Chromium 포함).
+
+### NSIS 설치 파일 (.exe installer) 생성
+
+전체 설치 파일을 만들려면:
+
+1. **Windows 개발자 모드 활성화** (설정 → 개인정보/보안 → 개발자용)
+   - electron-builder가 캐시 추출 시 symbolic link를 사용하기 때문
+2. `electron-builder.yml`의 `win.target`을 `nsis`로 변경:
+   ```yaml
+   win:
+     target: nsis
+   ```
+3. 다음 실행:
+   ```bash
+   npm run dist
+   ```
+
+설치 파일은 `release/CodeBurn Monitor Setup X.X.X.exe` 에 생성됩니다.
+
+### 빌드 결과물 직접 실행 (개발 중)
 
 ```bash
 npm run build
