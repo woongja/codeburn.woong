@@ -50,10 +50,16 @@ function createWindow(): BrowserWindow {
   })
 
   // Load renderer
-  if (process.env.NODE_ENV === 'development') {
+  if (!app.isPackaged && process.env.VITE_DEV_SERVER_URL) {
+    win.loadURL(process.env.VITE_DEV_SERVER_URL)
+    win.webContents.openDevTools({ mode: 'detach' })
+  } else if (!app.isPackaged) {
+    // Dev mode without VITE env var - assume Vite is on default port
     win.loadURL('http://localhost:5173')
+    win.webContents.openDevTools({ mode: 'detach' })
   } else {
-    win.loadFile(path.join(__dirname, 'renderer', 'index.html'))
+    // Production: renderer is at dist/renderer/index.html, main is at dist/main/index.js
+    win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
   }
 
   // Save position on move

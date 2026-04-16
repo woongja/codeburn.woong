@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeBurn Monitor - Widget Mockups</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding: 40px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 48px;
+    font-size: 14px;
+  }
+  .mockup-section {
+    margin-bottom: 60px;
+  }
+  .mockup-section h2 {
+    font-size: 20px;
+    color: #f0a030;
+    margin-bottom: 8px;
+  }
+  .mockup-section .desc {
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  .mockup-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  /* === Option A: Compact Bar === */
+  .widget-bar {
+    width: 320px;
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    border: 1px solid rgba(240, 160, 48, 0.3);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+  }
+  .widget-bar .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .widget-bar .logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f0a030;
+    letter-spacing: 0.5px;
+  }
+  .widget-bar .period {
+    font-size: 11px;
+    color: #888;
+    background: rgba(255,255,255,0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .widget-bar .cost-big {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+  .widget-bar .cost-big .currency {
+    font-size: 18px;
+    color: #f0a030;
+    margin-right: 2px;
+  }
+  .widget-bar .stats-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+  }
+  .widget-bar .stat {
+    font-size: 11px;
+    color: #aaa;
+  }
+  .widget-bar .stat span {
+    color: #fff;
+    font-weight: 600;
+  }
+  .widget-bar .bar-chart {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 32px;
+    margin-top: 12px;
+  }
+  .widget-bar .bar-chart .bar {
+    flex: 1;
+    border-radius: 2px;
+    min-height: 3px;
+    background: linear-gradient(to top, #f0a030, #e74c3c);
+    opacity: 0.8;
+  }
+
+  /* === Option B: Detailed Panel === */
+  .widget-panel {
+    width: 300px;
+    background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+    border: 1px solid rgba(240, 160, 48, 0.2);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .widget-panel .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .widget-panel .header .title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f0a030;
+  }
+  .widget-panel .header .close-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #888;
+    cursor: pointer;
+  }
+  .widget-panel .cost-section {
+    text-align: center;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .widget-panel .cost-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .widget-panel .cost-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .widget-panel .cost-value .dollar {
+    color: #f0a030;
+    font-size: 22px;
+  }
+  .widget-panel .period-tabs {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .widget-panel .period-tabs .tab {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    color: #888;
+    cursor: pointer;
+  }
+  .widget-panel .period-tabs .tab.active {
+    background: rgba(240,160,48,0.2);
+    color: #f0a030;
+  }
+  .widget-panel .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    font-size: 12px;
+  }
+  .widget-panel .detail-row .label {
+    color: #888;
+  }
+  .widget-panel .detail-row .value {
+    color: #ddd;
+    font-weight: 600;
+  }
+  .widget-panel .model-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .widget-panel .model-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 11px;
+  }
+  .widget-panel .model-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .widget-panel .model-name { color: #bbb; flex: 1; }
+  .widget-panel .model-cost { color: #ddd; font-weight: 600; }
+  .widget-panel .model-bar-bg {
+    width: 60px;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .widget-panel .model-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  /* === Option C: Mini Circle === */
+  .widget-circle-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .widget-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    border: 2px solid rgba(240, 160, 48, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 60px rgba(240,160,48,0.1);
+    position: relative;
+    cursor: pointer;
+  }
+  .widget-circle .cost-mini {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .widget-circle .cost-mini .dollar-mini {
+    font-size: 14px;
+    color: #f0a030;
+  }
+  .widget-circle .label-mini {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+  }
+  .widget-circle svg {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 148px;
+    height: 148px;
+    transform: rotate(-90deg);
+  }
+  .widget-circle svg circle {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .widget-circle .bg-ring { stroke: rgba(255,255,255,0.05); }
+  .widget-circle .progress-ring {
+    stroke: #f0a030;
+    stroke-dasharray: 440;
+    stroke-dashoffset: 132;
+  }
+  .widget-circle-label {
+    font-size: 11px;
+    color: #666;
+  }
+
+  /* expanded state */
+  .widget-circle-expanded {
+    width: 200px;
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    border: 1px solid rgba(240, 160, 48, 0.25);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .widget-circle-expanded .top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .widget-circle-expanded .mini-ring {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #f0a030;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #f0a030;
+  }
+  .widget-circle-expanded .top-info .cost-exp {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .widget-circle-expanded .top-info .period-exp {
+    font-size: 10px;
+    color: #888;
+  }
+  .widget-circle-expanded .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .widget-circle-expanded .stat-item {
+    font-size: 10px;
+    color: #888;
+  }
+  .widget-circle-expanded .stat-item .sv {
+    font-size: 13px;
+    color: #ddd;
+    font-weight: 600;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* Positioning demo */
+  .position-demo {
+    margin-top: 48px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.02);
+  }
+  .position-demo h2 {
+    font-size: 18px;
+    color: #f0a030;
+    margin-bottom: 8px;
+  }
+  .position-demo .desc {
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .screen-sim {
+    width: 100%;
+    max-width: 700px;
+    aspect-ratio: 16 / 10;
+    background: #0a0a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    position: relative;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .screen-sim .taskbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    background: #111;
+    border-top: 1px solid #333;
+  }
+  .screen-sim .pos-label {
+    position: absolute;
+    font-size: 10px;
+    color: #f0a030;
+    padding: 4px 8px;
+    background: rgba(240,160,48,0.15);
+    border-radius: 4px;
+  }
+  .screen-sim .top-left { top: 12px; left: 12px; }
+  .screen-sim .top-right { top: 12px; right: 12px; }
+  .screen-sim .bottom-right { bottom: 40px; right: 12px; }
+  .screen-sim .bottom-left { bottom: 40px; left: 12px; }
+
+  .screen-sim .widget-preview {
+    position: absolute;
+    width: 160px;
+    height: 80px;
+    background: linear-gradient(135deg, #16213e, #0f3460);
+    border: 1px solid rgba(240,160,48,0.3);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .screen-sim .widget-preview.tl { top: 30px; left: 12px; }
+  .screen-sim .widget-preview.br { bottom: 40px; right: 12px; }
+  .screen-sim .widget-preview .wp-cost {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .screen-sim .widget-preview .wp-sub {
+    font-size: 8px;
+    color: #888;
+  }
+
+  .note {
+    margin-top: 32px;
+    padding: 16px 20px;
+    background: rgba(240,160,48,0.08);
+    border-left: 3px solid #f0a030;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: #bbb;
+    line-height: 1.6;
+  }
+  .note strong { color: #f0a030; }
+</style>
+</head>
+<body>
+
+<h1>CodeBurn Monitor - Widget Mockups</h1>
+<p class="subtitle">항상 보이는 데스크톱 위젯 3가지 디자인 옵션</p>
+
+<!-- Option A -->
+<div class="mockup-section">
+  <h2>Option A: Compact Bar (컴팩트 바)</h2>
+  <p class="desc">가로형 바 위젯. 핵심 정보를 한 줄에 보여주고 아래에 7일 차트 표시. 작업 중 시야를 덜 가림.</p>
+  <div class="mockup-row">
+    <div class="widget-bar">
+      <div class="top-row">
+        <span class="logo">CODEBURN</span>
+        <span class="period">Today</span>
+      </div>
+      <div class="cost-big"><span class="currency">$</span>12.47</div>
+      <div class="stats-row">
+        <div class="stat">API calls <span>847</span></div>
+        <div class="stat">Sessions <span>12</span></div>
+        <div class="stat">Cache <span>68%</span></div>
+      </div>
+      <div class="bar-chart">
+        <div class="bar" style="height:40%"></div>
+        <div class="bar" style="height:65%"></div>
+        <div class="bar" style="height:30%"></div>
+        <div class="bar" style="height:85%"></div>
+        <div class="bar" style="height:55%"></div>
+        <div class="bar" style="height:100%"></div>
+        <div class="bar" style="height:70%"></div>
+      </div>
+    </div>
+
+    <div class="widget-bar" style="width:200px;">
+      <div class="top-row">
+        <span class="logo">CODEBURN</span>
+        <span class="period">Today</span>
+      </div>
+      <div class="cost-big" style="font-size:24px;"><span class="currency" style="font-size:14px;">$</span>12.47</div>
+      <div class="stats-row">
+        <div class="stat">Calls <span>847</span></div>
+        <div class="stat">Cache <span>68%</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Option B -->
+<div class="mockup-section">
+  <h2>Option B: Detailed Panel (상세 패널)</h2>
+  <p class="desc">세로형 패널. 모델별 비용, 토큰 수, 세션 수 등 상세 정보 표시. 정보량 많음.</p>
+  <div class="mockup-row">
+    <div class="widget-panel">
+      <div class="header">
+        <span class="title">CODEBURN</span>
+        <div class="close-btn">x</div>
+      </div>
+      <div class="cost-section">
+        <div class="cost-label">Today's Cost</div>
+        <div class="cost-value"><span class="dollar">$</span>12.47</div>
+      </div>
+      <div class="period-tabs">
+        <span class="tab active">Today</span>
+        <span class="tab">7D</span>
+        <span class="tab">30D</span>
+        <span class="tab">All</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">API Calls</span>
+        <span class="value">847</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Sessions</span>
+        <span class="value">12</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Input Tokens</span>
+        <span class="value">1.2M</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Output Tokens</span>
+        <span class="value">340K</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Cache Hit</span>
+        <span class="value">68%</span>
+      </div>
+      <div class="model-section">
+        <div class="model-row">
+          <div class="model-dot" style="background:#e74c3c;"></div>
+          <span class="model-name">Opus 4.6</span>
+          <span class="model-cost">$8.20</span>
+          <div class="model-bar-bg"><div class="model-bar-fill" style="width:82%;background:#e74c3c;"></div></div>
+        </div>
+        <div class="model-row">
+          <div class="model-dot" style="background:#3498db;"></div>
+          <span class="model-name">Sonnet 4.6</span>
+          <span class="model-cost">$3.80</span>
+          <div class="model-bar-bg"><div class="model-bar-fill" style="width:38%;background:#3498db;"></div></div>
+        </div>
+        <div class="model-row">
+          <div class="model-dot" style="background:#2ecc71;"></div>
+          <span class="model-name">Haiku 4.5</span>
+          <span class="model-cost">$0.47</span>
+          <div class="model-bar-bg"><div class="model-bar-fill" style="width:5%;background:#2ecc71;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Option C -->
+<div class="mockup-section">
+  <h2>Option C: Mini Circle (미니 서클)</h2>
+  <p class="desc">원형 미니 위젯. 평소엔 작게, 클릭하면 확장. 가장 적은 화면 차지.</p>
+  <div class="mockup-row">
+    <div class="widget-circle-wrap">
+      <div class="widget-circle">
+        <svg viewBox="0 0 148 148">
+          <circle class="bg-ring" cx="74" cy="74" r="70"/>
+          <circle class="progress-ring" cx="74" cy="74" r="70"/>
+        </svg>
+        <div class="cost-mini"><span class="dollar-mini">$</span>12.47</div>
+        <div class="label-mini">today</div>
+      </div>
+      <span class="widget-circle-label">접힌 상태 (Collapsed)</span>
+    </div>
+
+    <div class="widget-circle-wrap">
+      <div class="widget-circle-expanded">
+        <div class="top">
+          <div class="mini-ring">70%</div>
+          <div class="top-info">
+            <div class="cost-exp">$12.47</div>
+            <div class="period-exp">Today</div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">API Calls<span class="sv">847</span></div>
+          <div class="stat-item">Sessions<span class="sv">12</span></div>
+          <div class="stat-item">Input<span class="sv">1.2M</span></div>
+          <div class="stat-item">Output<span class="sv">340K</span></div>
+        </div>
+      </div>
+      <span class="widget-circle-label">펼친 상태 (Expanded)</span>
+    </div>
+  </div>
+</div>
+
+<!-- Position Demo -->
+<div class="position-demo">
+  <h2>Widget Position (위치 옵션)</h2>
+  <p class="desc">화면 어디에 위젯을 고정할지 선택. 드래그로 이동도 가능하게 구현 예정.</p>
+  <div class="screen-sim">
+    <div class="widget-preview tl">
+      <div class="wp-cost">$12.47</div>
+      <div class="wp-sub">왼쪽 위 (Top Left)</div>
+    </div>
+    <div class="widget-preview br">
+      <div class="wp-cost">$12.47</div>
+      <div class="wp-sub">오른쪽 아래 (Bottom Right)</div>
+    </div>
+    <span class="pos-label top-right">Top Right</span>
+    <span class="pos-label bottom-left">Bottom Left</span>
+    <div class="taskbar"></div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Tech Stack 예상:</strong> Electron (always-on-top frameless window) + React + Claude Code JSONL 파서<br>
+  <strong>데이터 소스:</strong> ~/.claude/projects/ 폴더의 세션 JSONL 파일 실시간 파싱<br>
+  <strong>기능:</strong> 자동 갱신, 기간 전환 (Today/7D/30D), 드래그 이동, 트레이 아이콘
+</div>
+
+</body>
+</html>

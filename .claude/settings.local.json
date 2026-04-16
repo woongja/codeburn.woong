@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone *)",
+      "Bash(git init *)",
+      "Bash(npm install *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(ls /c/Users/woongjae/Desktop/antigravity/codeburn-monitor/postcss.config*)",
+      "Bash(npx tsc *)",
+      "Bash(python3 -c \"import sys, json; p = json.load\\(sys.stdin\\); print\\('version:', p.get\\('version'\\)\\); print\\('type:', p.get\\('type', 'none'\\)\\)\")",
+      "Bash(node *)",
+      "Bash(npx vite *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

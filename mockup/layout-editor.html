@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>CodeBurn Monitor - Layout Editor Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    padding: 40px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    width: 100%;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+
+  .column { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .label { font-size: 13px; color: #f0a030; font-weight: 600; margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: #666; margin-bottom: 8px; }
+
+  /* === Detail Panel with cards === */
+  .panel {
+    width: 300px;
+    background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+    border: 1px solid rgba(240,160,48,0.2);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .panel-header .title { font-size: 13px; font-weight: 700; color: #f0a030; }
+  .panel-header .actions { display: flex; gap: 8px; }
+  .panel-header .btn {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: rgba(255,255,255,0.08); border: none;
+    color: #888; font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .panel-header .btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  .card {
+    margin: 8px 12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+  }
+  .card-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .cost-big {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+  }
+  .cost-big .dollar { color: #f0a030; font-size: 20px; }
+  .period-tabs {
+    display: flex; gap: 4px; justify-content: center; margin-top: 8px;
+  }
+  .tab {
+    font-size: 10px; padding: 3px 10px; border-radius: 10px;
+    background: rgba(255,255,255,0.05); color: #888; cursor: pointer;
+  }
+  .tab.active { background: rgba(240,160,48,0.2); color: #f0a030; }
+
+  .stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; }
+  .stat-row .sl { color: #888; }
+  .stat-row .sv { color: #ddd; font-weight: 600; }
+
+  .model-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 11px; }
+  .mdot { width: 8px; height: 8px; border-radius: 50%; }
+  .mname { color: #bbb; flex: 1; }
+  .mcost { color: #ddd; font-weight: 600; min-width: 50px; text-align: right; }
+  .mbar { width: 50px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .mbar-fill { height: 100%; border-radius: 2px; }
+
+  .project-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 11px; }
+  .pname { color: #bbb; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pcost { color: #ddd; font-weight: 600; min-width: 45px; text-align: right; }
+  .pbar { width: 40px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .pbar-fill { height: 100%; border-radius: 2px; background: #3498db; }
+
+  .daily-bars {
+    display: flex; gap: 3px; align-items: flex-end; height: 40px;
+  }
+  .dbar {
+    flex: 1; border-radius: 2px; min-height: 3px;
+    background: linear-gradient(to top, #f0a030, #e74c3c); opacity: 0.8;
+  }
+  .daily-labels { display: flex; gap: 3px; margin-top: 4px; }
+  .daily-labels span { flex: 1; font-size: 8px; color: #555; text-align: center; }
+
+  /* === Layout Editor === */
+  .editor {
+    width: 320px;
+    background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+    border: 1px solid rgba(240,160,48,0.4);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(240,160,48,0.08);
+  }
+  .editor-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 16px;
+    background: rgba(240,160,48,0.08);
+    border-bottom: 1px solid rgba(240,160,48,0.2);
+  }
+  .editor-header .etitle { font-size: 14px; font-weight: 700; color: #f0a030; }
+  .editor-header .close {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: none;
+    color: #888; font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .editor-body { padding: 12px 14px; }
+
+  .card-toggle {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; margin-bottom: 6px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    cursor: grab;
+    transition: background 0.15s;
+  }
+  .card-toggle:hover { background: rgba(255,255,255,0.06); }
+  .card-toggle .grip { color: #555; font-size: 14px; cursor: grab; }
+  .card-toggle .cname { flex: 1; font-size: 12px; color: #ddd; }
+
+  .toggle-switch {
+    width: 36px; height: 20px; border-radius: 10px;
+    background: #333; position: relative; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-switch.on { background: rgba(240,160,48,0.6); }
+  .toggle-switch .knob {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; position: absolute; top: 2px;
+    transition: left 0.2s;
+  }
+  .toggle-switch .knob { left: 2px; }
+  .toggle-switch.on .knob { left: 18px; }
+
+  .section-title {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: #666; margin: 16px 0 8px 0;
+  }
+
+  .size-btns { display: flex; gap: 6px; }
+  .size-btn {
+    flex: 1; padding: 7px; border-radius: 8px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    color: #aaa; font-size: 11px; text-align: center; cursor: pointer;
+  }
+  .size-btn.active {
+    background: rgba(240,160,48,0.15); border-color: rgba(240,160,48,0.4);
+    color: #f0a030;
+  }
+
+  .opacity-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .slider-track {
+    flex: 1; height: 4px; background: #333; border-radius: 2px;
+    position: relative;
+  }
+  .slider-fill {
+    height: 100%; width: 85%; background: #f0a030; border-radius: 2px;
+  }
+  .slider-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; border: 2px solid #f0a030;
+    position: absolute; top: -5px; left: 83%;
+  }
+  .opacity-val { font-size: 12px; color: #ddd; min-width: 32px; }
+
+  .editor-footer {
+    display: flex; gap: 8px; padding: 12px 14px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .btn-reset {
+    flex: 1; padding: 8px; border-radius: 8px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: #aaa; font-size: 11px; cursor: pointer; text-align: center;
+  }
+  .btn-done {
+    flex: 1; padding: 8px; border-radius: 8px;
+    background: rgba(240,160,48,0.3); border: 1px solid rgba(240,160,48,0.5);
+    color: #f0a030; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center;
+  }
+
+  .arrow {
+    font-size: 32px; color: #555; align-self: center; margin-top: 100px;
+  }
+</style>
+</head>
+<body>
+
+<h1>CodeBurn Monitor - Layout System</h1>
+<p class="subtitle">왼쪽: 기본 패널 (Mode B) / 오른쪽: 레이아웃 편집 모드</p>
+
+<!-- Default Detail Panel -->
+<div class="column">
+  <span class="label">Mode B: Detailed Panel</span>
+  <span class="sublabel">카드 기반 UI - 각 블록이 독립적</span>
+
+  <div class="panel">
+    <div class="panel-header">
+      <span class="title">CODEBURN</span>
+      <div class="actions">
+        <button class="btn" title="Edit Layout">⚙</button>
+        <button class="btn" title="Minimize">−</button>
+      </div>
+    </div>
+
+    <!-- Cost Card -->
+    <div class="card">
+      <div class="cost-big"><span class="dollar">$</span>12.47</div>
+      <div class="period-tabs">
+        <span class="tab active">Today</span>
+        <span class="tab">7D</span>
+        <span class="tab">30D</span>
+        <span class="tab">All</span>
+      </div>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="card">
+      <div class="card-title">Statistics</div>
+      <div class="stat-row"><span class="sl">API Calls</span><span class="sv">847</span></div>
+      <div class="stat-row"><span class="sl">Sessions</span><span class="sv">12</span></div>
+      <div class="stat-row"><span class="sl">Cache Hit</span><span class="sv">68%</span></div>
+    </div>
+
+    <!-- Tokens Card -->
+    <div class="card">
+      <div class="card-title">Tokens</div>
+      <div class="stat-row"><span class="sl">Input</span><span class="sv">1.2M</span></div>
+      <div class="stat-row"><span class="sl">Output</span><span class="sv">340K</span></div>
+      <div class="stat-row"><span class="sl">Cache Read</span><span class="sv">890K</span></div>
+      <div class="stat-row"><span class="sl">Cache Write</span><span class="sv">150K</span></div>
+    </div>
+
+    <!-- Models Card -->
+    <div class="card">
+      <div class="card-title">Models</div>
+      <div class="model-row">
+        <div class="mdot" style="background:#e74c3c;"></div>
+        <span class="mname">Opus 4.6</span>
+        <span class="mcost">$8.20</span>
+        <div class="mbar"><div class="mbar-fill" style="width:82%;background:#e74c3c;"></div></div>
+      </div>
+      <div class="model-row">
+        <div class="mdot" style="background:#3498db;"></div>
+        <span class="mname">Sonnet 4.6</span>
+        <span class="mcost">$3.80</span>
+        <div class="mbar"><div class="mbar-fill" style="width:38%;background:#3498db;"></div></div>
+      </div>
+      <div class="model-row">
+        <div class="mdot" style="background:#2ecc71;"></div>
+        <span class="mname">Haiku 4.5</span>
+        <span class="mcost">$0.47</span>
+        <div class="mbar"><div class="mbar-fill" style="width:5%;background:#2ecc71;"></div></div>
+      </div>
+    </div>
+
+    <!-- Projects Card -->
+    <div class="card">
+      <div class="card-title">Projects</div>
+      <div class="project-row">
+        <span class="pname">codeburn-monitor</span>
+        <span class="pcost">$5.40</span>
+        <div class="pbar"><div class="pbar-fill" style="width:100%;"></div></div>
+      </div>
+      <div class="project-row">
+        <span class="pname">my-webapp</span>
+        <span class="pcost">$3.20</span>
+        <div class="pbar"><div class="pbar-fill" style="width:59%;"></div></div>
+      </div>
+      <div class="project-row">
+        <span class="pname">api-server</span>
+        <span class="pcost">$2.10</span>
+        <div class="pbar"><div class="pbar-fill" style="width:39%;"></div></div>
+      </div>
+      <div class="project-row">
+        <span class="pname">dotfiles</span>
+        <span class="pcost">$1.77</span>
+        <div class="pbar"><div class="pbar-fill" style="width:33%;"></div></div>
+      </div>
+    </div>
+
+    <!-- Daily Card -->
+    <div class="card">
+      <div class="card-title">Daily (7D)</div>
+      <div class="daily-bars">
+        <div class="dbar" style="height:25%"></div>
+        <div class="dbar" style="height:45%"></div>
+        <div class="dbar" style="height:30%"></div>
+        <div class="dbar" style="height:80%"></div>
+        <div class="dbar" style="height:55%"></div>
+        <div class="dbar" style="height:100%"></div>
+        <div class="dbar" style="height:65%"></div>
+      </div>
+      <div class="daily-labels">
+        <span>10</span><span>11</span><span>12</span><span>13</span>
+        <span>14</span><span>15</span><span>16</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<span class="arrow">→</span>
+
+<!-- Layout Editor -->
+<div class="column">
+  <span class="label">Layout Editor</span>
+  <span class="sublabel">⚙ 클릭 시 열림 - 드래그로 순서 변경, 토글로 on/off</span>
+
+  <div class="editor">
+    <div class="editor-header">
+      <span class="etitle">⚙ Layout Editor</span>
+      <button class="close">✕</button>
+    </div>
+
+    <div class="editor-body">
+      <div class="card-toggle">
+        <span class="grip">☰</span>
+        <span class="cname">총 비용</span>
+        <div class="toggle-switch on"><div class="knob"></div></div>
+      </div>
+      <div class="card-toggle">
+        <span class="grip">☰</span>
+        <span class="cname">기본 통계</span>
+        <div class="toggle-switch on"><div class="knob"></div></div>
+      </div>
+      <div class="card-toggle">
+        <span class="grip">☰</span>
+        <span class="cname">토큰 상세</span>
+        <div class="toggle-switch on"><div class="knob"></div></div>
+      </div>
+      <div class="card-toggle">
+        <span class="grip">☰</span>
+        <span class="cname">모델별 비용</span>
+        <div class="toggle-switch on"><div class="knob"></div></div>
+      </div>
+      <div class="card-toggle">
+        <span class="grip">☰</span>
+        <span class="cname">프로젝트별 비용</span>
+        <div class="toggle-switch on"><div class="knob"></div></div>
+      </div>
+      <div class="card-toggle">
+        <span class="grip">☰</span>
+        <span class="cname">일별 차트</span>
+        <div class="toggle-switch on"><div class="knob"></div></div>
+      </div>
+
+      <div class="section-title">Widget Size</div>
+      <div class="size-btns">
+        <div class="size-btn">Small</div>
+        <div class="size-btn active">Medium</div>
+        <div class="size-btn">Large</div>
+      </div>
+
+      <div class="section-title">Opacity</div>
+      <div class="opacity-row">
+        <div class="slider-track">
+          <div class="slider-fill"></div>
+          <div class="slider-thumb"></div>
+        </div>
+        <span class="opacity-val">85%</span>
+      </div>
+    </div>
+
+    <div class="editor-footer">
+      <div class="btn-reset">Reset Default</div>
+      <div class="btn-done">Done</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
