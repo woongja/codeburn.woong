@@ -202,12 +202,53 @@ npm run build   # dist/ 생성 (renderer + main 컴파일)
 npm run pack    # release/win-unpacked/ 에 실행 파일 생성
 ```
 
-빌드 후 `release/win-unpacked/CodeBurn Monitor.exe` 더블클릭으로 실행합니다.
-크기는 약 230MB (Electron + Chromium 포함).
+#### 빌드 결과물 위치
+
+```
+release/
+└── win-unpacked/
+    ├── CodeBurn Monitor.exe   ← 더블클릭하면 앱 실행 (181 MB)
+    ├── *.dll                   (Chromium, V8 등 런타임)
+    ├── locales/                (다국어 리소스)
+    ├── resources/app.asar      (앱 코드)
+    └── ...
+```
+
+전체 폴더 크기: 약 230 MB (Electron + Chromium 포함)
+
+#### 실행 방법
+
+**파일 탐색기에서:**
+1. `release/win-unpacked` 폴더 열기
+2. `CodeBurn Monitor.exe` 더블클릭
+
+**터미널에서:**
+```bash
+"release/win-unpacked/CodeBurn Monitor.exe"
+```
+
+> ⚠️ **주의**: `win-unpacked` 폴더 내 모든 파일이 함께 있어야 실행됩니다.
+> `.exe` 하나만 따로 옮기면 동작하지 않습니다 (DLL, locales, resources 등 필요).
+
+#### 다른 사용자와 공유
+
+폴더를 통째로 ZIP으로 묶어 공유하면 됩니다.
+
+**Git Bash / PowerShell:**
+```bash
+cd release
+tar -a -c -f CodeBurn-Monitor-v0.1.0-win-x64.zip win-unpacked
+```
+
+**파일 탐색기:**
+- `win-unpacked` 폴더 우클릭 → "ZIP으로 압축"
+
+받은 사람은 압축 풀고 `CodeBurn Monitor.exe`를 더블클릭하면 바로 사용 가능합니다.
+별도 설치 절차가 필요 없는 **portable** 형태입니다.
 
 ### NSIS 설치 파일 (.exe installer) 생성
 
-전체 설치 파일을 만들려면:
+자동 설치 파일을 만들려면:
 
 1. **Windows 개발자 모드 활성화** (설정 → 개인정보/보안 → 개발자용)
    - electron-builder가 캐시 추출 시 symbolic link를 사용하기 때문
@@ -222,6 +263,23 @@ npm run pack    # release/win-unpacked/ 에 실행 파일 생성
    ```
 
 설치 파일은 `release/CodeBurn Monitor Setup X.X.X.exe` 에 생성됩니다.
+
+### 단일 파일 (.exe) Portable 빌드
+
+폴더 통째로가 아니라 **단일 .exe 파일**로 만들려면:
+
+1. **Windows 개발자 모드 활성화** (위와 동일)
+2. `electron-builder.yml`의 `win.target`을 `portable`로 변경:
+   ```yaml
+   win:
+     target: portable
+   ```
+3. ```bash
+   npm run dist
+   ```
+
+결과: `release/CodeBurn Monitor X.X.X.exe` 단일 파일.
+실행 시 임시 폴더에 압축 해제 후 동작합니다 (첫 실행 약간 느림).
 
 ### 빌드 결과물 직접 실행 (개발 중)
 
