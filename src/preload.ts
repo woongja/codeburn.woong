@@ -22,6 +22,7 @@ const api: ElectronAPI = {
   windowDrag: (deltaX, deltaY) => ipcRenderer.send('window-drag', deltaX, deltaY),
   savePosition: (x, y) => ipcRenderer.send('save-position', x, y),
   resizeWindow: (width, height) => ipcRenderer.send('resize-window', width, height),
+  quitApp: () => ipcRenderer.send('quit-app'),
   getSettings: () => ipcRenderer.invoke('get-settings'),
   getUsageData: () => ipcRenderer.invoke('get-usage-data'),
 }

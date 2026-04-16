@@ -76,6 +76,7 @@ const en: Dict = {
   'tray.quit': 'Quit',
 
   // DetailPanel buttons
+  'panel.quit': 'Quit app',
   'panel.minimize': 'Minimize to circle',
   'panel.hide': 'Hide widget',
   'panel.editLayout': 'Edit Layout',
@@ -155,6 +156,7 @@ const ko: Dict = {
   'tray.quit': '종료',
 
   // DetailPanel buttons
+  'panel.quit': '앱 종료',
   'panel.minimize': '미니 서클로 축소',
   'panel.hide': '위젯 숨기기',
   'panel.editLayout': '레이아웃 편집',

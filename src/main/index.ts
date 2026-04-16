@@ -107,10 +107,19 @@ export function getMainWindow(): BrowserWindow | null {
   return mainWindow
 }
 
+/**
+ * Resize the window while keeping the bottom-right corner fixed.
+ * This means when the user shrinks panel→circle, the circle appears at the
+ * bottom-right of where the panel used to be (instead of top-left shrinking).
+ */
 export function resizeMainWindow(width: number, height: number): void {
-  if (mainWindow) {
-    mainWindow.setSize(width, height)
-  }
+  if (!mainWindow) return
+  const [oldX, oldY] = mainWindow.getPosition()
+  const [oldWidth, oldHeight] = mainWindow.getSize()
+  const newX = oldX + oldWidth - width
+  const newY = oldY + oldHeight - height
+  mainWindow.setBounds({ x: newX, y: newY, width, height })
+  setPosition(newX, newY)
 }
 
 export function moveWindow(deltaX: number, deltaY: number): void {

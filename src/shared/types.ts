@@ -138,6 +138,7 @@ export type ElectronAPI = {
   readonly windowDrag: (deltaX: number, deltaY: number) => void
   readonly savePosition: (x: number, y: number) => void
   readonly resizeWindow: (width: number, height: number) => void
+  readonly quitApp: () => void
   readonly getSettings: () => Promise<Settings>
   readonly getUsageData: () => Promise<UsageData>
 }

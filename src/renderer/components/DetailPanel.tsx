@@ -122,23 +122,21 @@ export function DetailPanel({ data, settings, onMinimize }: Props) {
           borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        {/* Traffic lights (left) */}
+        {/* Traffic lights (left): red=quit, yellow=minimize-to-circle, green=settings */}
         <div className="flex gap-1.5 items-center" data-no-drag>
           <TrafficLight
             color="#ff5f57"
             hoverColor="#4d0000"
             symbol="×"
-            title={t(lang, 'panel.minimize')}
-            onClick={onMinimize}
+            title={t(lang, 'panel.quit')}
+            onClick={() => window.electronAPI.quitApp()}
           />
           <TrafficLight
             color="#ffbd2e"
             hoverColor="#995700"
             symbol="−"
-            title={t(lang, 'panel.hide')}
-            onClick={() => {
-              window.electronAPI.changeMode('circle')
-            }}
+            title={t(lang, 'panel.minimize')}
+            onClick={onMinimize}
           />
           <TrafficLight
             color="#28c940"

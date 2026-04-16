@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { app, ipcMain } from 'electron'
 import { getSettings, setMode, setPeriod, setCurrencySetting, setLayout, setPlan, setLanguage } from './store'
 import { getMainWindow, resizeMainWindow, moveWindow } from './index'
 import { forceRefresh } from './watcher'
@@ -71,6 +71,10 @@ export function setupIpc(): void {
 
   ipcMain.on('resize-window', (_event, width: number, height: number) => {
     resizeMainWindow(width, height)
+  })
+
+  ipcMain.on('quit-app', () => {
+    app.quit()
   })
 }
 
