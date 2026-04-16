@@ -11,6 +11,7 @@ import type {
   ProjectBreakdown,
   DailyBreakdown,
   Period,
+  WindowStats,
 } from './types'
 
 function parseJsonlLine(line: string): JournalEntry | null {
@@ -166,11 +167,35 @@ function isInRange(timestamp: string, start: Date, end: Date): boolean {
   return ts >= start && ts <= end
 }
 
+function aggregateWindow(calls: ReadonlyArray<ParsedApiCall>, windowMs: number): WindowStats {
+  const now = Date.now()
+  const cutoff = now - windowMs
+  let cost = 0
+  let count = 0
+  let oldest: string | null = null
+  let oldestTs = Infinity
+
+  for (const call of calls) {
+    const ts = new Date(call.timestamp).getTime()
+    if (ts >= cutoff && ts <= now) {
+      cost += call.costUSD
+      count += 1
+      if (ts < oldestTs) {
+        oldestTs = ts
+        oldest = call.timestamp
+      }
+    }
+  }
+
+  return { costUSD: cost, apiCalls: count, oldestTimestamp: oldest }
+}
+
 export async function parseAllSessions(period: Period): Promise<UsageData> {
   await initPricing()
 
   const seenIds = new Set<string>()
-  const allCalls: ParsedApiCall[] = []
+  const periodCalls: ParsedApiCall[] = []
+  const allTimeCalls: ParsedApiCall[] = []
   const projectCalls = new Map<string, ParsedApiCall[]>()
   let sessionCount = 0
 
@@ -195,11 +220,12 @@ export async function parseAllSessions(period: Period): Promise<UsageData> {
     const projectCallList: ParsedApiCall[] = []
     for (const file of jsonlFiles) {
       const calls = parseSessionFile(file, seenIds)
+      allTimeCalls.push(...calls)
       const filtered = calls.filter((c) => isInRange(c.timestamp, start, end))
       if (filtered.length > 0) {
         sessionCount++
         projectCallList.push(...filtered)
-        allCalls.push(...filtered)
+        periodCalls.push(...filtered)
       }
     }
 
@@ -208,15 +234,21 @@ export async function parseAllSessions(period: Period): Promise<UsageData> {
     }
   }
 
-  return buildUsageData(allCalls, projectCalls, sessionCount)
+  // Always-current windows (independent of selected period)
+  const last5h = aggregateWindow(allTimeCalls, 5 * 60 * 60 * 1000)
+  const last7d = aggregateWindow(allTimeCalls, 7 * 24 * 60 * 60 * 1000)
+
+  return buildUsageData(periodCalls, projectCalls, sessionCount, last5h, last7d)
 }
 
 function buildUsageData(
   allCalls: ReadonlyArray<ParsedApiCall>,
   projectCalls: Map<string, ParsedApiCall[]>,
   sessionCount: number,
+  last5h: WindowStats,
+  last7d: WindowStats,
 ): UsageData {
-  if (allCalls.length === 0) return emptyUsageData()
+  if (allCalls.length === 0) return { ...emptyUsageData(), last5h, last7d }
 
   // Aggregate totals
   let totalCost = 0
@@ -314,6 +346,8 @@ function buildUsageData(
     models,
     projects,
     daily,
+    last5h,
+    last7d,
   }
 }
 
@@ -327,5 +361,7 @@ function emptyUsageData(): UsageData {
     models: [],
     projects: [],
     daily: [],
+    last5h: { costUSD: 0, apiCalls: 0, oldestTimestamp: null },
+    last7d: { costUSD: 0, apiCalls: 0, oldestTimestamp: null },
   }
 }

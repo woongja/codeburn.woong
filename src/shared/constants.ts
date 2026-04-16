@@ -1,14 +1,12 @@
-import type { CardConfig, CurrencyCode, LayoutSettings, Settings } from './types'
+import type { CardConfig, CurrencyCode, LayoutSettings, Plan, Settings } from './types'
 
-export const CLAUDE_PROJECTS_DIR = (() => {
-  const home = process.env.HOME || process.env.USERPROFILE || ''
-  return `${home}/.claude/projects`
-})()
+// Guard process access - constants.ts is imported by both main (Node) and renderer (browser)
+const HOME_DIR = (typeof process !== 'undefined' && process.env)
+  ? (process.env.HOME || process.env.USERPROFILE || '')
+  : ''
 
-export const CACHE_DIR = (() => {
-  const home = process.env.HOME || process.env.USERPROFILE || ''
-  return `${home}/.cache/codeburn-monitor`
-})()
+export const CLAUDE_PROJECTS_DIR = `${HOME_DIR}/.claude/projects`
+export const CACHE_DIR = `${HOME_DIR}/.cache/codeburn-monitor`
 
 export const LITELLM_PRICING_URL =
   'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json'
@@ -24,12 +22,15 @@ export const WIDGET_SIZES = {
 } as const
 
 export const DEFAULT_CARDS: ReadonlyArray<CardConfig> = [
-  { id: 'cost', enabled: true, order: 0 },
-  { id: 'stats', enabled: true, order: 1 },
-  { id: 'tokens', enabled: true, order: 2 },
-  { id: 'models', enabled: true, order: 3 },
-  { id: 'projects', enabled: true, order: 4 },
-  { id: 'daily', enabled: true, order: 5 },
+  // Default visible: stats, tokens, projects, limits (in this order)
+  { id: 'stats', enabled: true, order: 0 },
+  { id: 'tokens', enabled: true, order: 1 },
+  { id: 'projects', enabled: true, order: 2 },
+  { id: 'limits', enabled: true, order: 3 },
+  // Available but off by default (user can enable in Layout Editor)
+  { id: 'cost', enabled: false, order: 4 },
+  { id: 'models', enabled: false, order: 5 },
+  { id: 'daily', enabled: false, order: 6 },
 ]
 
 export const DEFAULT_LAYOUT: LayoutSettings = {
@@ -44,7 +45,23 @@ export const DEFAULT_SETTINGS: Settings = {
   period: 'today',
   currency: 'USD',
   autoStart: true,
+  plan: 'pro',
+  language: 'ko',
   layout: DEFAULT_LAYOUT,
+}
+
+// API-equivalent cost limits per plan (rough community estimates, NOT official)
+export type PlanLimits = {
+  readonly displayName: string
+  readonly limit5hUSD: number
+  readonly limitWeekUSD: number
+}
+
+export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
+  free: { displayName: 'Free', limit5hUSD: 1, limitWeekUSD: 5 },
+  pro: { displayName: 'Pro', limit5hUSD: 15, limitWeekUSD: 60 },
+  max5x: { displayName: 'Max 5x', limit5hUSD: 75, limitWeekUSD: 300 },
+  max20x: { displayName: 'Max 20x', limit5hUSD: 250, limitWeekUSD: 1200 },
 }
 
 export const CURRENCY_SYMBOLS: Record<CurrencyCode, string> = {

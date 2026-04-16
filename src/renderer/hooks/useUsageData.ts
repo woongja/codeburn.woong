@@ -10,6 +10,8 @@ const emptyData: UsageData = {
   models: [],
   projects: [],
   daily: [],
+  last5h: { costUSD: 0, apiCalls: 0, oldestTimestamp: null },
+  last7d: { costUSD: 0, apiCalls: 0, oldestTimestamp: null },
 }
 
 export function useUsageData(): UsageData {

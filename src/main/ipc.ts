@@ -1,10 +1,11 @@
 import { ipcMain } from 'electron'
-import { getSettings, setMode, setPeriod, setCurrencySetting, setLayout } from './store'
+import { getSettings, setMode, setPeriod, setCurrencySetting, setLayout, setPlan, setLanguage } from './store'
 import { getMainWindow, resizeMainWindow, moveWindow } from './index'
 import { forceRefresh } from './watcher'
+import { rebuildMenu } from './tray'
 import { parseAllSessions } from '../shared/parser'
 import { setCurrency } from '../shared/currency'
-import type { WidgetMode, Period, CurrencyCode, LayoutSettings } from '../shared/types'
+import type { WidgetMode, Period, CurrencyCode, LayoutSettings, Plan, Language } from '../shared/types'
 import { WIDGET_SIZES } from '../shared/constants'
 
 export function setupIpc(): void {
@@ -21,7 +22,7 @@ export function setupIpc(): void {
     setMode(mode)
     const settings = getSettings()
     const width = mode === 'circle' ? 160 : WIDGET_SIZES[settings.layout.widgetSize]
-    const height = mode === 'circle' ? 160 : 600
+    const height = mode === 'circle' ? 160 : Math.round(width * 4 / 3)
     resizeMainWindow(width, height)
     broadcastSettings()
   })
@@ -39,11 +40,23 @@ export function setupIpc(): void {
     forceRefresh()
   })
 
+  ipcMain.on('change-plan', (_event, plan: Plan) => {
+    setPlan(plan)
+    broadcastSettings()
+  })
+
+  ipcMain.on('change-language', (_event, language: Language) => {
+    setLanguage(language)
+    broadcastSettings()
+    rebuildMenu()
+  })
+
   ipcMain.on('update-layout', (_event, layout: LayoutSettings) => {
     setLayout(layout)
     const settings = getSettings()
     if (settings.mode === 'panel') {
-      resizeMainWindow(WIDGET_SIZES[layout.widgetSize], 600)
+      const width = WIDGET_SIZES[layout.widgetSize]
+      resizeMainWindow(width, Math.round(width * 4 / 3))
     }
     broadcastSettings()
   })

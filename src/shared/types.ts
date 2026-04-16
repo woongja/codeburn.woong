@@ -69,6 +69,13 @@ export type DailyBreakdown = {
   readonly apiCalls: number
 }
 
+// Aggregated stats for a fixed time window (used by limits card)
+export type WindowStats = {
+  readonly costUSD: number
+  readonly apiCalls: number
+  readonly oldestTimestamp: string | null // earliest call in the window (for reset countdown)
+}
+
 // Full usage data sent from main to renderer
 export type UsageData = {
   readonly totalCostUSD: number
@@ -79,10 +86,16 @@ export type UsageData = {
   readonly models: ReadonlyArray<ModelBreakdown>
   readonly projects: ReadonlyArray<ProjectBreakdown>
   readonly daily: ReadonlyArray<DailyBreakdown>
+  // Always-current windows (independent of selected period)
+  readonly last5h: WindowStats
+  readonly last7d: WindowStats
 }
 
+// Claude subscription plan (rough estimates of API-equivalent cost limits)
+export type Plan = 'free' | 'pro' | 'max5x' | 'max20x'
+
 // Card IDs for layout editor
-export type CardId = 'cost' | 'stats' | 'tokens' | 'models' | 'projects' | 'daily'
+export type CardId = 'cost' | 'stats' | 'tokens' | 'models' | 'projects' | 'daily' | 'limits'
 
 export type CardConfig = {
   readonly id: CardId
@@ -99,6 +112,7 @@ export type LayoutSettings = {
 export type WidgetMode = 'circle' | 'panel'
 export type Period = 'today' | '7d' | '30d' | 'all'
 export type CurrencyCode = 'USD' | 'KRW' | 'EUR' | 'JPY' | 'GBP' | 'CNY'
+export type Language = 'ko' | 'en'
 
 // Full settings stored in electron-store
 export type Settings = {
@@ -107,6 +121,8 @@ export type Settings = {
   readonly period: Period
   readonly currency: CurrencyCode
   readonly autoStart: boolean
+  readonly plan: Plan
+  readonly language: Language
   readonly layout: LayoutSettings
 }
 
@@ -116,6 +132,8 @@ export type ElectronAPI = {
   readonly onSettingsChanged: (callback: (settings: Settings) => void) => () => void
   readonly changeMode: (mode: WidgetMode) => void
   readonly changePeriod: (period: Period) => void
+  readonly changePlan: (plan: Plan) => void
+  readonly changeLanguage: (lang: Language) => void
   readonly updateLayout: (layout: LayoutSettings) => void
   readonly windowDrag: (deltaX: number, deltaY: number) => void
   readonly savePosition: (x: number, y: number) => void

@@ -1,21 +1,24 @@
-import type { UsageData } from '@shared/types'
+import type { UsageData, Language } from '@shared/types'
+import { t } from '@shared/i18n'
 
-type Props = { data: UsageData }
+type Props = { data: UsageData; language: Language }
 
-export function DailyCard({ data }: Props) {
-  const days = data.daily.slice(-14) // Show up to 14 days
+export function DailyCard({ data, language }: Props) {
+  const days = data.daily.slice(-14)
   const maxCost = Math.max(...days.map((d) => d.costUSD), 0.01)
 
   return (
-    <div className="p-3 rounded-[10px] bg-white/[0.03] border border-white/[0.06]">
-      <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Daily</div>
-      <div className="flex gap-[3px] items-end h-[40px]">
+    <div className="px-3 py-2.5 rounded-[10px] bg-white/[0.04] border border-white/[0.08]">
+      <div className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-1.5">
+        {t(language, 'card.daily.title')}
+      </div>
+      <div className="flex gap-[3px] items-end h-[42px]">
         {days.map((d) => {
           const heightPercent = Math.max((d.costUSD / maxCost) * 100, 5)
           return (
             <div
               key={d.date}
-              className="flex-1 rounded-sm min-h-[3px] opacity-80"
+              className="flex-1 rounded-[2px] min-h-[3px]"
               style={{
                 height: `${heightPercent}%`,
                 background: 'linear-gradient(to top, #f0a030, #e74c3c)',
@@ -25,15 +28,17 @@ export function DailyCard({ data }: Props) {
           )
         })}
       </div>
-      <div className="flex gap-[3px] mt-1">
+      <div className="flex gap-[3px] mt-1.5">
         {days.map((d) => (
-          <span key={d.date} className="flex-1 text-[8px] text-gray-600 text-center">
+          <span key={d.date} className="flex-1 text-[9px] font-bold text-gray-500 text-center tabular-nums">
             {d.date.slice(8)}
           </span>
         ))}
       </div>
       {days.length === 0 && (
-        <div className="text-[11px] text-gray-600 text-center py-2">No data</div>
+        <div className="text-[11px] font-semibold text-gray-500 text-center py-2">
+          {t(language, 'common.noData')}
+        </div>
       )}
     </div>
   )

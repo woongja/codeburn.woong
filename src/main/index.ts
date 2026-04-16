@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from 'electron'
+import { app, BrowserWindow, Menu, screen } from 'electron'
 import * as path from 'path'
 import { getSettings, setPosition } from './store'
 import { setupTray } from './tray'
@@ -15,12 +15,15 @@ function getInitialPosition(): { x: number; y: number } {
     return settings.position
   }
   // Default: bottom-right, above taskbar
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+  const display = screen.getPrimaryDisplay()
+  const { width, height } = display.workAreaSize
+  const { x: areaX, y: areaY } = display.workArea
   const widgetWidth = WIDGET_SIZES[settings.layout.widgetSize]
   const widgetHeight = settings.mode === 'circle' ? 160 : 500
+  console.log('[main] workArea:', display.workArea, 'workAreaSize:', display.workAreaSize)
   return {
-    x: width - widgetWidth - 20,
-    y: height - widgetHeight - 20,
+    x: areaX + width - widgetWidth - 20,
+    y: areaY + height - widgetHeight - 20,
   }
 }
 
@@ -31,9 +34,14 @@ function createWindow(): BrowserWindow {
     ? 160
     : WIDGET_SIZES[settings.layout.widgetSize]
 
+  const preloadPath = path.join(__dirname, '..', 'preload.js')
+  console.log('[main] preload path:', preloadPath)
+  console.log('[main] window position:', pos, 'size:', widgetWidth, 'x', settings.mode === 'circle' ? 160 : 600)
+
+  // Frameless transparent window - Mac-style traffic lights are rendered in React
   const win = new BrowserWindow({
     width: widgetWidth,
-    height: settings.mode === 'circle' ? 160 : 600,
+    height: settings.mode === 'circle' ? 160 : Math.round(widgetWidth * 4 / 3), // 3:4 aspect ratio for panel
     x: pos.x,
     y: pos.y,
     frame: false,
@@ -42,24 +50,48 @@ function createWindow(): BrowserWindow {
     skipTaskbar: true,
     resizable: false,
     hasShadow: false,
+    autoHideMenuBar: true,
+    show: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
     },
   })
 
+  // Remove default menu (File/Edit/View)
+  win.setMenu(null)
+
+  win.once('ready-to-show', () => {
+    console.log('[main] window ready, showing')
+    win.show()
+  })
+
+  win.webContents.on('did-fail-load', (_e, code, desc, url) => {
+    console.error('[main] did-fail-load:', code, desc, url)
+  })
+
+  win.webContents.on('preload-error', (_e, preloadPath, error) => {
+    console.error('[main] preload-error:', preloadPath, error)
+  })
+
+  win.webContents.on('console-message', (_e, _level, message) => {
+    console.log('[renderer]', message)
+  })
+
   // Load renderer
   if (!app.isPackaged && process.env.VITE_DEV_SERVER_URL) {
+    console.log('[main] loading dev URL:', process.env.VITE_DEV_SERVER_URL)
     win.loadURL(process.env.VITE_DEV_SERVER_URL)
-    win.webContents.openDevTools({ mode: 'detach' })
+    win.webContents.openDevTools({ mode: 'undocked' })
   } else if (!app.isPackaged) {
-    // Dev mode without VITE env var - assume Vite is on default port
+    console.log('[main] loading default dev URL: http://localhost:5173')
     win.loadURL('http://localhost:5173')
-    win.webContents.openDevTools({ mode: 'detach' })
+    win.webContents.openDevTools({ mode: 'undocked' })
   } else {
-    // Production: renderer is at dist/renderer/index.html, main is at dist/main/index.js
-    win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
+    const htmlPath = path.join(__dirname, '..', 'renderer', 'index.html')
+    console.log('[main] loading file:', htmlPath)
+    win.loadFile(htmlPath)
   }
 
   // Save position on move
@@ -88,13 +120,22 @@ export function moveWindow(deltaX: number, deltaY: number): void {
 }
 
 app.whenReady().then(async () => {
-  mainWindow = createWindow()
-  setupIpc()
-  setupTray()
-  startWatcher()
+  console.log('[main] app ready, creating window')
+  // Globally remove the default application menu (File/Edit/View)
+  Menu.setApplicationMenu(null)
+  try {
+    mainWindow = createWindow()
+    setupIpc()
+    console.log('[main] IPC ready')
+    try { setupTray() } catch (e) { console.error('[main] tray failed:', e) }
+    try { startWatcher() } catch (e) { console.error('[main] watcher failed:', e) }
 
-  const settings = getSettings()
-  await setupAutoLaunch(settings.autoStart)
+    const settings = getSettings()
+    try { await setupAutoLaunch(settings.autoStart) } catch (e) { console.error('[main] auto-launch failed:', e) }
+    console.log('[main] startup complete')
+  } catch (err) {
+    console.error('[main] startup failed:', err)
+  }
 })
 
 app.on('window-all-closed', () => {

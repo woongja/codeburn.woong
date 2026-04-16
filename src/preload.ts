@@ -16,6 +16,8 @@ const api: ElectronAPI = {
 
   changeMode: (mode) => ipcRenderer.send('change-mode', mode),
   changePeriod: (period) => ipcRenderer.send('change-period', period),
+  changePlan: (plan) => ipcRenderer.send('change-plan', plan),
+  changeLanguage: (lang) => ipcRenderer.send('change-language', lang),
   updateLayout: (layout) => ipcRenderer.send('update-layout', layout),
   windowDrag: (deltaX, deltaY) => ipcRenderer.send('window-drag', deltaX, deltaY),
   savePosition: (x, y) => ipcRenderer.send('save-position', x, y),

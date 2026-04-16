@@ -4,9 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CodeBurn Monitor</title>
+  <style>
+    html, body { background: transparent; color: #fff; }
+    /* Boot fallback - shown only before React mounts. Has its own bg so it's visible. */
+    #boot-fallback {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 12px;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div id="boot-fallback">
+      <div style="color: #f0a030; font-weight: bold; margin-bottom: 8px;">CodeBurn boot</div>
+      <div id="boot-status" style="color: #888;">Loading React...</div>
+      <div id="boot-error" style="color: #e74c3c; margin-top: 8px; white-space: pre-wrap;"></div>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('error', (e) => {
+      const el = document.getElementById('boot-error')
+      if (el) el.textContent = 'Error: ' + (e.message || e.error)
+    })
+    window.addEventListener('unhandledrejection', (e) => {
+      const el = document.getElementById('boot-error')
+      if (el) el.textContent = 'Promise: ' + (e.reason && e.reason.message || e.reason)
+    })
+    setTimeout(() => {
+      const status = document.getElementById('boot-status')
+      if (status && status.textContent === 'Loading React...') {
+        status.textContent = 'React did not mount within 3s - check DevTools console'
+      }
+    }, 3000)
+  </script>
   <script type="module" src="./main.tsx"></script>
 </body>
 </html>

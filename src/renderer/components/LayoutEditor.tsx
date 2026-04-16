@@ -1,22 +1,15 @@
 import { useState, useCallback } from 'react'
 import type { Settings, CardConfig, CardId, LayoutSettings } from '@shared/types'
 import { DEFAULT_LAYOUT } from '@shared/constants'
+import { t } from '@shared/i18n'
 
 type Props = {
   settings: Settings
   onClose: () => void
 }
 
-const CARD_LABELS: Record<CardId, string> = {
-  cost: '총 비용',
-  stats: '기본 통계',
-  tokens: '토큰 상세',
-  models: '모델별 비용',
-  projects: '프로젝트별 비용',
-  daily: '일별 차트',
-}
-
 export function LayoutEditor({ settings, onClose }: Props) {
+  const lang = settings.language
   const [cards, setCards] = useState<CardConfig[]>(
     [...settings.layout.cards].sort((a, b) => a.order - b.order),
   )
@@ -93,7 +86,7 @@ export function LayoutEditor({ settings, onClose }: Props) {
         className="flex justify-between items-center px-4 py-3"
         style={{ background: 'rgba(240,160,48,0.08)', borderBottom: '1px solid rgba(240,160,48,0.2)' }}
       >
-        <span className="text-[14px] font-bold text-accent">⚙ Layout Editor</span>
+        <span className="text-[14px] font-bold text-accent">⚙ {t(lang, 'editor.title')}</span>
         <button
           onClick={onClose}
           className="w-[22px] h-[22px] rounded-full bg-white/10 flex items-center justify-center text-[12px] text-gray-500 hover:text-white"
@@ -117,7 +110,7 @@ export function LayoutEditor({ settings, onClose }: Props) {
             }`}
           >
             <span className="text-gray-600 text-[14px]">☰</span>
-            <span className="flex-1 text-[12px] text-gray-300">{CARD_LABELS[card.id]}</span>
+            <span className="flex-1 text-[12px] font-semibold text-gray-300">{t(lang, `cards.${card.id}`)}</span>
             <button
               onClick={() => toggleCard(card.id)}
               className={`w-9 h-5 rounded-full relative transition-colors ${
@@ -134,25 +127,25 @@ export function LayoutEditor({ settings, onClose }: Props) {
         ))}
 
         {/* Widget Size */}
-        <div className="text-[10px] uppercase tracking-widest text-gray-600 mt-4 mb-2">Widget Size</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mt-4 mb-2">{t(lang, 'editor.size')}</div>
         <div className="flex gap-1.5">
           {(['small', 'medium', 'large'] as const).map((size) => (
             <button
               key={size}
               onClick={() => handleSizeChange(size)}
-              className={`flex-1 py-1.5 rounded-lg text-[11px] text-center transition-colors ${
+              className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold text-center transition-colors ${
                 size === widgetSize
                   ? 'bg-accent/15 border border-accent/40 text-accent'
-                  : 'bg-white/5 border border-white/[0.08] text-gray-500 hover:bg-white/10'
+                  : 'bg-white/5 border border-white/[0.08] text-gray-400 hover:bg-white/10'
               }`}
             >
-              {size.charAt(0).toUpperCase() + size.slice(1)}
+              {t(lang, `editor.size.${size}`)}
             </button>
           ))}
         </div>
 
         {/* Opacity */}
-        <div className="text-[10px] uppercase tracking-widest text-gray-600 mt-4 mb-2">Opacity</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mt-4 mb-2">{t(lang, 'editor.opacity')}</div>
         <div className="flex items-center gap-2.5">
           <input
             type="range"
@@ -170,15 +163,15 @@ export function LayoutEditor({ settings, onClose }: Props) {
       <div className="flex gap-2 p-3 border-t border-white/[0.06]">
         <button
           onClick={handleReset}
-          className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-500 text-[11px] hover:bg-white/10 transition-colors"
+          className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-[11px] font-bold hover:bg-white/10 transition-colors"
         >
-          Reset Default
+          {t(lang, 'editor.reset')}
         </button>
         <button
           onClick={onClose}
-          className="flex-1 py-2 rounded-lg bg-accent/30 border border-accent/50 text-accent text-[11px] font-semibold hover:bg-accent/40 transition-colors"
+          className="flex-1 py-2 rounded-lg bg-accent/30 border border-accent/50 text-accent text-[11px] font-bold hover:bg-accent/40 transition-colors"
         >
-          Done
+          {t(lang, 'editor.done')}
         </button>
       </div>
     </div>

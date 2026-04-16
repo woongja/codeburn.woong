@@ -1,23 +1,25 @@
-import type { UsageData } from '@shared/types'
+import type { UsageData, Language } from '@shared/types'
+import { t } from '@shared/i18n'
 
-type Props = { data: UsageData }
+type Props = { data: UsageData; language: Language }
 
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between text-[12px] py-1">
-      <span className="text-gray-500">{label}</span>
-      <span className="text-gray-300 font-semibold">{value}</span>
+    <div className="flex justify-between items-center py-1.5">
+      <span className="text-[12px] font-semibold text-gray-300">{label}</span>
+      <span className="text-[14px] font-bold text-white tabular-nums">{value}</span>
     </div>
   )
 }
 
-export function StatsCard({ data }: Props) {
+export function StatsCard({ data, language }: Props) {
   return (
-    <div className="p-3 rounded-[10px] bg-white/[0.03] border border-white/[0.06]">
-      <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Statistics</div>
-      <StatRow label="API Calls" value={data.totalApiCalls.toLocaleString()} />
-      <StatRow label="Sessions" value={data.totalSessions.toLocaleString()} />
-      <StatRow label="Cache Hit" value={`${data.cacheHitPercent.toFixed(0)}%`} />
+    <div className="px-3 py-2.5 rounded-[10px] bg-white/[0.04] border border-white/[0.08]">
+      <div className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-1.5">
+        {t(language, 'card.stats.title')}
+      </div>
+      <StatRow label={t(language, 'card.stats.apiCalls')} value={data.totalApiCalls.toLocaleString()} />
+      <StatRow label={t(language, 'card.stats.sessions')} value={data.totalSessions.toLocaleString()} />
     </div>
   )
 }
