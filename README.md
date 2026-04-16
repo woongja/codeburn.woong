@@ -3,7 +3,8 @@
 Windows 데스크톱 위젯으로 **Claude Code API 사용량/비용을 실시간 모니터링**하는 Electron 앱.
 항상 최상위(always-on-top) frameless 윈도우로 화면 모서리에 상주하며, Mac 스타일 UI로 깔끔하게 표시됩니다.
 
-![widget modes](./mockup/index.html)
+<img width="301" height="434" alt="image" src="https://github.com/user-attachments/assets/91b41c28-5fb4-4eba-b2e4-9d0f1f836a67" />
+
 
 ## Features
 
@@ -415,13 +416,6 @@ codeburn-monitor/
 - **codeburn** by AgentSeal — CLI 터미널 대시보드
 - **codeburn-monitor** (이 프로젝트) — Windows 데스크톱 위젯
 
----
-
-## License
-
-MIT
-
----
 
 ## Roadmap
 
