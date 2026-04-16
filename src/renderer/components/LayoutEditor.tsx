@@ -74,16 +74,16 @@ export function LayoutEditor({ settings, onClose }: Props) {
 
   return (
     <div
-      className="rounded-[14px] overflow-hidden"
+      className="rounded-[14px] overflow-hidden h-full flex flex-col"
       style={{
         background: 'linear-gradient(180deg, #16213e 0%, #1a1a2e 100%)',
         border: '1px solid rgba(240, 160, 48, 0.4)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(240,160,48,0.08)',
       }}
     >
-      {/* Header */}
+      {/* Header (fixed) */}
       <div
-        className="flex justify-between items-center px-4 py-3"
+        className="flex justify-between items-center px-4 py-3 shrink-0"
         style={{ background: 'rgba(240,160,48,0.08)', borderBottom: '1px solid rgba(240,160,48,0.2)' }}
       >
         <span className="text-[14px] font-bold text-accent">⚙ {t(lang, 'editor.title')}</span>
@@ -96,8 +96,8 @@ export function LayoutEditor({ settings, onClose }: Props) {
         </button>
       </div>
 
-      {/* Card toggles */}
-      <div className="p-3" data-no-drag>
+      {/* Card toggles (scrollable) */}
+      <div className="p-3 overflow-y-auto flex-1" data-no-drag>
         {cards.map((card, index) => (
           <div
             key={card.id}
@@ -159,8 +159,8 @@ export function LayoutEditor({ settings, onClose }: Props) {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="flex gap-2 p-3 border-t border-white/[0.06]">
+      {/* Footer (fixed at bottom) */}
+      <div className="flex gap-2 p-3 border-t border-white/[0.06] shrink-0">
         <button
           onClick={handleReset}
           className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-[11px] font-bold hover:bg-white/10 transition-colors"
