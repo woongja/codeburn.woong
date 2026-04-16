@@ -83,6 +83,7 @@ export type TaskCategory =
   | 'build'
   | 'conversation'
   | 'brainstorming'
+  | 'continuation'
   | 'general'
 
 export type CategoryBreakdown = {

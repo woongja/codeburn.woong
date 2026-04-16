@@ -114,5 +114,26 @@ export function classifyTurn(
     return 'conversation'
   }
 
+  // Short continuation messages: "계속", "진행해", "continue", etc.
+  // Only classified as continuation if message is short AND matches continuation keywords
+  if (msg.length <= 30 && isContinuationMessage(msg)) {
+    return 'continuation'
+  }
+
   return 'general'
+}
+
+function isContinuationMessage(msg: string): boolean {
+  // Korean
+  const koPatterns = [
+    /^(계속|계속해|계속 진행|진행|진행해|진행해줘|고고|ㄱㄱ|고)/,
+    /^(다음|이어서|더 해|한 번 더|또 해|재시도)/,
+    /^(예|응|넵|네|오케이|오케)[\s.!?]*$/,
+  ]
+  // English
+  const enPatterns = [
+    /^(continue|keep going|proceed|go on|go ahead|next|more|retry|again|resume)\b/i,
+    /^(carry on|do it|let's go|one more)\b/i,
+  ]
+  return koPatterns.some((r) => r.test(msg)) || enPatterns.some((r) => r.test(msg))
 }

@@ -17,6 +17,7 @@ const CATEGORY_COLORS: Record<TaskCategory, string> = {
   build: '#7f8c8d',        // gray
   conversation: '#95a5a6', // light gray
   brainstorming: '#d35400',// burnt orange
+  continuation: '#5d6d7e', // steel blue-gray
   general: '#555555',      // neutral
 }
 
