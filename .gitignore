@@ -37,3 +37,7 @@ Thumbs.db
 # Electron
 electron-builder-effective-config.yaml
 codeburn/
+
+# Local Claude Code / OMC state (not for sharing)
+.claude/
+.omc/
