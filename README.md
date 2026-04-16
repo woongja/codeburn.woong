@@ -246,67 +246,90 @@ Claude Code "Fast mode" 사용 시 비용 배율 자동 적용:
 
 ## 설치 및 실행
 
-### 필요사항
+두 가지 방법이 있습니다. 목적에 맞는 것을 골라주세요.
 
-- Node.js 20+
-- npm
-- Windows 10/11
+### 🟢 A. 그냥 사용만 하고 싶은 경우 (비개발자 추천)
 
-### 설치
+소스 코드 clone, Node.js 설치, 빌드 과정 **전부 필요 없습니다**.
+
+#### 1단계. 저장소 clone
 
 ```bash
-git clone https://github.com/<your-fork>/codeburn-monitor.git
-cd codeburn-monitor
+git clone https://github.com/woongja/codeburn.woong.git
+```
+
+> git이 없다면 [여기서 저장소 ZIP 다운로드](https://github.com/woongja/codeburn.woong/archive/refs/heads/master.zip)
+> 받아서 압축 풀면 됩니다.
+
+#### 2단계. 빌드된 앱이 필요해요
+
+**현재 저장소엔 소스만 있고 `.exe`는 포함되어 있지 않습니다.** 둘 중 하나:
+
+- **방법 1 — 빌드된 파일을 가진 사람(예: 개발자)한테 ZIP으로 받기**
+  - `CodeBurn-Monitor-vX.X.X-win-x64.zip` 을 받으면
+  - 원하는 폴더에 압축 풀기
+  - 그 안의 `CodeBurn Monitor.exe` 더블클릭 → 끝!
+
+- **방법 2 — 직접 빌드** (아래 개발자 섹션 참고, Node.js 필요)
+
+#### 3단계. 편하게 쓰기
+
+- **바탕화면 바로가기**: `CodeBurn Monitor.exe` 우클릭 → "바로가기 만들기" → 바탕화면으로 드래그
+- **작업표시줄에 고정**: `.exe` 우클릭 → "작업 표시줄에 고정"
+- **Windows 시작 시 자동 실행**: 앱 실행 후 트레이 아이콘 우클릭 → "자동 시작" 체크
+
+> ⚠️ **주의**: `win-unpacked` 폴더 안의 모든 파일이 함께 있어야 동작합니다.
+> `.exe` 하나만 옮기면 안 됩니다. 바로가기는 원본 위치를 참조하니까 괜찮아요.
+
+---
+
+### 🔵 B. 소스에서 직접 빌드 또는 개발하고 싶은 경우
+
+#### 필요 사항
+
+- [Node.js 20+](https://nodejs.org/)
+- npm (Node.js 설치 시 함께 설치됨)
+- Windows 10/11
+
+#### 1단계. 소스 받기 + 의존성 설치
+
+```bash
+git clone https://github.com/woongja/codeburn.woong.git
+cd codeburn.woong
 npm install
 ```
 
-### 개발 모드 실행
+#### 2단계. 개발 모드로 실행 (코드 수정하면서 테스트)
 
 ```bash
 npm run electron:dev
 ```
 
 Vite dev server + TypeScript watch + Electron이 동시에 실행됩니다.
-DevTools도 자동으로 열립니다.
+DevTools도 자동으로 열립니다. 터미널 닫으면 앱도 종료됩니다.
 
-### 프로덕션 빌드 (Unpacked .exe)
+#### 3단계. `.exe` 파일로 빌드하기 (터미널 없이 실행 가능)
 
 ```bash
-npm run build   # dist/ 생성 (renderer + main 컴파일)
-npm run pack    # release/win-unpacked/ 에 실행 파일 생성
+npm run build   # 소스 컴파일
+npm run pack    # .exe 생성
 ```
 
-#### 빌드 결과물 위치
-
+빌드 결과:
 ```
 release/
 └── win-unpacked/
-    ├── CodeBurn Monitor.exe   ← 더블클릭하면 앱 실행 (181 MB)
-    ├── *.dll                   (Chromium, V8 등 런타임)
-    ├── locales/                (다국어 리소스)
-    ├── resources/app.asar      (앱 코드)
-    └── ...
+    ├── CodeBurn Monitor.exe   ← 이 파일이 실행 파일 (약 181 MB)
+    ├── *.dll                   (런타임)
+    ├── locales/
+    └── resources/app.asar
 ```
 
-전체 폴더 크기: 약 230 MB (Electron + Chromium 포함)
+전체 폴더 크기 약 230 MB. **이제 터미널 닫고 `CodeBurn Monitor.exe` 더블클릭으로 실행 가능합니다.**
 
-#### 실행 방법
+#### 4단계. 다른 사람에게 공유하려면
 
-**파일 탐색기에서:**
-1. `release/win-unpacked` 폴더 열기
-2. `CodeBurn Monitor.exe` 더블클릭
-
-**터미널에서:**
-```bash
-"release/win-unpacked/CodeBurn Monitor.exe"
-```
-
-> ⚠️ **주의**: `win-unpacked` 폴더 내 모든 파일이 함께 있어야 실행됩니다.
-> `.exe` 하나만 따로 옮기면 동작하지 않습니다 (DLL, locales, resources 등 필요).
-
-#### 다른 사용자와 공유
-
-폴더를 통째로 ZIP으로 묶어 공유하면 됩니다.
+폴더 통째로 ZIP으로 묶어서 보냅니다:
 
 **Git Bash / PowerShell:**
 ```bash
@@ -317,50 +340,27 @@ tar -a -c -f CodeBurn-Monitor-v0.1.0-win-x64.zip win-unpacked
 **파일 탐색기:**
 - `win-unpacked` 폴더 우클릭 → "ZIP으로 압축"
 
-받은 사람은 압축 풀고 `CodeBurn Monitor.exe`를 더블클릭하면 바로 사용 가능합니다.
-별도 설치 절차가 필요 없는 **portable** 형태입니다.
+받은 사람은 위의 **A. 2단계 방법 1**대로 하면 됩니다.
 
-### NSIS 설치 파일 (.exe installer) 생성
+---
 
-자동 설치 파일을 만들려면:
+### 고급: 설치 파일 (.exe installer) 생성
+
+자동 설치 파일이 필요한 경우 (`Setup.exe` 형태):
 
 1. **Windows 개발자 모드 활성화** (설정 → 개인정보/보안 → 개발자용)
-   - electron-builder가 캐시 추출 시 symbolic link를 사용하기 때문
-2. `electron-builder.yml`의 `win.target`을 `nsis`로 변경:
-   ```yaml
-   win:
-     target: nsis
-   ```
-3. 다음 실행:
-   ```bash
-   npm run dist
-   ```
+2. `electron-builder.yml`의 `win.target`을 `nsis`로 변경
+3. `npm run dist` 실행 → `release/CodeBurn Monitor Setup X.X.X.exe`
 
-설치 파일은 `release/CodeBurn Monitor Setup X.X.X.exe` 에 생성됩니다.
+### 고급: 단일 파일 portable 빌드
 
-### 단일 파일 (.exe) Portable 빌드
+폴더 통째로가 아니라 `.exe` 하나로 만들기:
 
-폴더 통째로가 아니라 **단일 .exe 파일**로 만들려면:
+1. 개발자 모드 활성화 (위와 동일)
+2. `electron-builder.yml`의 `win.target`을 `portable`로 변경
+3. `npm run dist` → `release/CodeBurn Monitor X.X.X.exe` (단일 파일)
 
-1. **Windows 개발자 모드 활성화** (위와 동일)
-2. `electron-builder.yml`의 `win.target`을 `portable`로 변경:
-   ```yaml
-   win:
-     target: portable
-   ```
-3. ```bash
-   npm run dist
-   ```
-
-결과: `release/CodeBurn Monitor X.X.X.exe` 단일 파일.
-실행 시 임시 폴더에 압축 해제 후 동작합니다 (첫 실행 약간 느림).
-
-### 빌드 결과물 직접 실행 (개발 중)
-
-```bash
-npm run build
-npm start
-```
+첫 실행이 약간 느립니다 (임시 폴더에 압축 해제 후 실행).
 
 ---
 
